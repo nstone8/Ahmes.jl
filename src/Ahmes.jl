@@ -4,6 +4,9 @@ using Tessen, Unitful
 export CompiledGeometry, GWLJob, multijob
 
 maxpoints = 200
+#if a number is less than this, we will treat it as zero for the purposes
+#of stage movement
+zerotol = 1E-12
 
 """
 ```
@@ -53,13 +56,11 @@ end
 
 function writegwl(io,b::Block{HatchedSlice};
                   relorigin::Vector{<:Unitful.Length})
-    if !all(iszero.(relorigin))
         #need to move the stage to our origin
-        (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
-        println(io, "MoveStageX $xmove")
-        println(io, "MoveStageY $ymove")
-        println(io, "AddZDrivePosition $zmove")
-    end
+    (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
+    (xmove > zerotol) ? println(io, "MoveStageX $xmove") : nothing
+    (ymove > zerotol) ? println(io, "MoveStageY $ymove") : nothing
+    (zmove > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
     #write all the slices in the block
     allz = collect(s[1] for s in slices(b)) |> sort
     for z in allz
@@ -150,13 +151,11 @@ end
 
 function writegwl(io,cg::CompiledGeometry;
                   relorigin::Vector{<:Unitful.Length})
-    if !all(iszero.(relorigin))
-        #first move to `cg`s origin
-        (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
-        println(io, "MoveStageX $xmove")
-        println(io, "MoveStageY $ymove")
-        println(io, "AddZDrivePosition $zmove")
-    end
+    #first move to `cg`s origin
+    (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
+    (xmove > zerotol) ? println(io, "MoveStageX $xmove") : nothing
+    (ymove > zerotol) ? println(io, "MoveStageY $ymove") : nothing
+    (zmove > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
     #include the compiled .gwl code
     println(io, "include $(cg.filepath)")
     #this will result in a stage movement of relorigin+cg.displacement
