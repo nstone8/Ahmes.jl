@@ -58,9 +58,9 @@ function writegwl(io,b::Block{HatchedSlice};
                   relorigin::Vector{<:Unitful.Length})
         #need to move the stage to our origin
     (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
-    (xmove > zerotol) ? println(io, "MoveStageX $xmove") : nothing
-    (ymove > zerotol) ? println(io, "MoveStageY $ymove") : nothing
-    (zmove > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
+    (abs(xmove) > zerotol) ? println(io, "MoveStageX $xmove") : nothing
+    (abs(ymove) > zerotol) ? println(io, "MoveStageY $ymove") : nothing
+    (abs(zmove) > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
     #write all the slices in the block
     allz = collect(s[1] for s in slices(b)) |> sort
     for z in allz
@@ -153,9 +153,9 @@ function writegwl(io,cg::CompiledGeometry;
                   relorigin::Vector{<:Unitful.Length})
     #first move to `cg`s origin
     (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
-    (xmove > zerotol) ? println(io, "MoveStageX $xmove") : nothing
-    (ymove > zerotol) ? println(io, "MoveStageY $ymove") : nothing
-    (zmove > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
+    (abs(xmove) > zerotol) ? println(io, "MoveStageX $xmove") : nothing
+    (abs(ymove) > zerotol) ? println(io, "MoveStageY $ymove") : nothing
+    (abs(zmove) > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
     #include the compiled .gwl code
     println(io, "include $(cg.filepath)")
     #this will result in a stage movement of relorigin+cg.displacement
