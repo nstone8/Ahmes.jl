@@ -51,18 +51,17 @@ function writegwl(io,hs::HatchedSlice,z)
         println(io,"write")
         curpathlen=0
     end
-    #pick up here, hlines should now be organized conveniently
 end
 
 function writegwl(io,b::Block{HatchedSlice};
                   relorigin::Vector{<:Unitful.Length})
-        #need to move the stage to our origin
+    #need to move the stage to our origin
     (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
     (abs(xmove) > zerotol) ? println(io, "MoveStageX $xmove") : nothing
     (abs(ymove) > zerotol) ? println(io, "MoveStageY $ymove") : nothing
     (abs(zmove) > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
     #write all the slices in the block
-    allz = collect(s[1] for s in slices(b)) |> sort
+    allz = collect(Set(s[1] for s in slices(b))) |> sort
     for z in allz
         theseslices = filter(slices(b)) do (thisz,thisslice)
             thisz == z
