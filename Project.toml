@@ -1,7 +1,7 @@
 name = "Ahmes"
 uuid = "8b92ad99-622a-4a49-8522-837eeba52978"
 authors = ["Nick Stone <nicholasestone@proton.me>"]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 Tessen = "075f01f5-5a08-42fe-8034-8ba17c561f6c"

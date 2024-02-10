@@ -208,12 +208,18 @@ function multijob(filepath,gj...;stagespeed)
         #set the stage velocity
         rawstagespeed = ustrip(u"µm/s",stagespeed)
         println(io,"StageVelocity $rawstagespeed")
+        numjob = length(gj)
+        numdone = 0
         for (location,job) in gj
             #move to location in global coordinates
             (lx,ly) = ustrip.(u"µm",location)
             println(io,"GlobalGotoX $lx")
             println(io,"GlobalGotoY $ly")
             println(io,"include $(job.filepath)")
+            #update the progress bar
+            numdone += 1
+            pctdone = 100*(numdone/numjob)
+            println(io,"ReportProgressPercent $pctdone")
         end
     end
 end
