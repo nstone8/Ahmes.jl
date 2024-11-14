@@ -56,7 +56,8 @@ end
 function writegwl(io,b::Block{HatchedSlice};
                   relorigin::Vector{<:Unitful.Length})
     #need to move the stage to our origin
-    (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
+    #add float call to ensure uniform formatting
+    (xmove,ymove,zmove) = float.(ustrip.(u"µm",relorigin))
     (abs(xmove) > zerotol) ? println(io, "MoveStageX $xmove") : nothing
     (abs(ymove) > zerotol) ? println(io, "MoveStageY $ymove") : nothing
     (abs(zmove) > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
@@ -151,7 +152,10 @@ end
 function writegwl(io,cg::CompiledGeometry;
                   relorigin::Vector{<:Unitful.Length})
     #first move to `cg`s origin
-    (xmove,ymove,zmove) = ustrip.(u"µm",relorigin)
+    #we convert to float to make sure we don't have formatting issues
+    #there was a bug where `Rational` values were being printed in a
+    #way deScribe didn't like
+    (xmove,ymove,zmove) = float.(ustrip.(u"µm",relorigin))
     (abs(xmove) > zerotol) ? println(io, "MoveStageX $xmove") : nothing
     (abs(ymove) > zerotol) ? println(io, "MoveStageY $ymove") : nothing
     (abs(zmove) > zerotol) ? println(io, "AddZDrivePosition $zmove") : nothing
